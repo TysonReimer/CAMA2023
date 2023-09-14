@@ -1,0 +1,5 @@
+numpy
+multiprocessing
+matplotlib
+pyvisa
+pyserial
