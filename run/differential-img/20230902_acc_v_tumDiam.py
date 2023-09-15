@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use('tkagg')
 import matplotlib.pyplot as plt
 
-from umbms import get_proj_path, verify_path
+from umbms import get_proj_path
 
 ###############################################################################
 

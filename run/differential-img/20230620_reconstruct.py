@@ -159,7 +159,6 @@ def recon_imgs(s11, idx_pairs, id_pairs, do_das=True, do_dmas=False,
 
     # For each breast pair
     for ii in range(np.size(s11_pair_diffs, axis=0)):
-    # for ii in range(2951, 3699):  # Special bounds for sharing workload
 
         logger.info('\tWorking on pair [%4d / %4d]...'
                     % (ii + 1, np.size(s11_pair_diffs, axis=0)))
@@ -478,69 +477,3 @@ if __name__ == "__main__":
         do_dmas=False,
         do_orr=True,
     )
-
-    # recon_imgs(
-    #     s11=s11_pair_diffs,
-    #     idx_pairs=idx_pairs,
-    #     id_pairs=id_pairs,
-    #     do_das=False,
-    #     do_dmas=True,
-    #     do_orr=False,
-    # )
-
-    ### -----------------------------------------------------------------------
-
-    # orr_o_dir = os.path.join(__O_DIR, 'orr/')
-    # verify_path(orr_o_dir)
-    #
-    # orr_imgs = load_pickle(os.path.join(orr_o_dir, 'orr_imgs.pickle'))
-    #
-    # # For each breast pair
-    # for ii in range(np.size(s11_pair_diffs, axis=0)):
-    #
-    #     logger.info('\tPlotting on pair [%4d / %4d]...'
-    #                 % (ii + 1, np.size(s11_pair_diffs, axis=0)))
-    #
-    #     # Get the metadata of the left/right breasts
-    #     md_left = md[idx_pairs[ii, 0]]
-    #     md_right = md[idx_pairs[ii, 1]]
-    #
-    #     # If left breast has a tumour
-    #     if ~np.isnan(md_left['tum_x']):
-    #         tum_y = md_left['tum_y']
-    #         if id_pairs[ii, 0] < 0:  # If the breast was mirrored
-    #             tum_x = -md_left['tum_x']  # Mirror tum position
-    #         else:
-    #             tum_x = md_left['tum_x']
-    #         tum_rad = md_left['tum_diam'] / 2
-    #
-    #     # If right breast has a tumour
-    #     elif ~np.isnan(md_right['tum_x']):
-    #         tum_y = md_right['tum_y']
-    #         if id_pairs[ii, 1] < 0:  # If the breast was mirrored
-    #             tum_x = -md_right['tum_x']  # Mirror tum position
-    #         else:
-    #             tum_x = md_right['tum_x']
-    #         tum_rad = md_right['tum_diam'] / 2
-    #     else:  # If no breast had a tumour
-    #         tum_x = 0
-    #         tum_y = 0
-    #         tum_rad = 0
-    #
-    #     # Get the scan metadata explicitly
-    #     adi_rad = __ADI_RADS[md_left['phant_id'].split('F')[0]]
-    #
-    #     # Plot the reconstruction
-    #     plot_img(img=np.abs(orr_imgs[ii, :, :]),
-    #              tar_xs=[tum_x],
-    #              tar_ys=[tum_y],
-    #              tar_rads=[tum_rad],
-    #              phant_rad=adi_rad,
-    #              roi_rho=__ROI_RAD,
-    #              save_str=os.path.join(orr_o_dir, 'id_%d-%d.png'
-    #                                    % (id_pairs[ii, 0],
-    #                                       id_pairs[ii, 1])),
-    #              transparent=False,
-    #              save_close=True,
-    #              save_fig=True,
-    #                  )

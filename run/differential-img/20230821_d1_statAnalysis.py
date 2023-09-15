@@ -6,25 +6,15 @@ June 20th, 2023
 
 import os
 import numpy as np
-import matplotlib
-matplotlib.use('tkagg')
-import seaborn as sns
 import pandas as pd
 
 import statsmodels.api as sm
 from scipy.stats import norm
 
-# Use 'tkagg' to display plot windows, use 'agg' to *not* display
-# plot windows
-
-import matplotlib.pyplot as plt
-
 from umbms import get_proj_path, verify_path, get_script_logger
 
-from umbms.loadsave import load_pickle,save_pickle
+from umbms.loadsave import load_pickle
 
-from umbms.iqms.contrast import get_scr
-from umbms.iqms.accuracy import get_loc_err
 
 ###############################################################################
 
@@ -33,33 +23,6 @@ __D_DIR = os.path.join(get_proj_path(), 'data/umbmid/g3/')
 __O_DIR = os.path.join(get_proj_path(), 'output/differential-d1/')
 verify_path(__O_DIR)
 
-# The frequency parameters from the scan
-__INI_F = 1e9
-__FIN_F = 9e9
-__N_FS = 1001
-__SCAN_FS = np.linspace(__INI_F, __FIN_F, __N_FS)
-
-__M_SIZE = 150  # Number of pixels along 1-dimension for reconstruction
-__ROI_RAD = 8  # ROI radius, in [cm]
-
-# The approximate radius of each adipose phantom in our array
-__ADI_RADS = {
-    'A1': 5,
-    'A2': 6,
-    'A3': 7,
-    'A11': 6,
-    'A12': 5,
-    'A13': 6.5,
-    'A14': 6,
-    'A15': 5.5,
-    'A16': 7,
-}
-
-# Polar coordinate phi of the antenna at each position during the scan
-__ANT_PHIS = np.flip(np.linspace(0, 355, 72) + -136.0)
-
-__SCR_THRESH = 1.5
-
 # Define colors for plotting
 das_col = [0, 0, 0]
 dmas_col = [80, 80, 80]
@@ -67,8 +30,6 @@ gd_col = [160, 160, 160]
 das_col = [ii / 255 for ii in das_col]
 dmas_col = [ii / 255 for ii in dmas_col]
 gd_col = [ii / 255 for ii in gd_col]
-
-###############################################################################
 
 
 ###############################################################################
@@ -220,7 +181,6 @@ if __name__ == "__main__":
         logger.info('\t\tOdds ratio:\t\t\t%.3f\t(%.3f,\t%.3f)'
                     % (odds_ratio, or_low, or_high))
         logger.info('\t\tp-value:\t\t\t%.3e' % pval)
-
 
     # Report results
     logger.info('UNHEALTHY RESULTS...')

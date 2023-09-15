@@ -495,6 +495,9 @@ if __name__ == "__main__":
 
     logger = get_script_logger(__file__)
 
+    # Flag for using maximum-intensity -based diagnostic criteria
+    do_max_based = True
+
     # Load the indices of pairs
     id_pairs = np.array(load_pickle(
         os.path.join(__D_DIR, 'differential/pairs_ideal_sym_mirror.pickle')))
@@ -507,36 +510,41 @@ if __name__ == "__main__":
     scan_ids = np.array([ii['id'] for ii in md])
 
     # Load the image files
-    # orr_imgs = load_pickle(os.path.join(__O_DIR, 'orr/orr_imgs.pickle'))
-    # das_imgs = load_pickle(os.path.join(__O_DIR, 'das/das_imgs.pickle'))
-    # dmas_imgs = load_pickle(os.path.join(__O_DIR, 'dmas/dmas_imgs.pickle'))
-    das_imgs = load_pickle(os.path.join(__O_DIR, 'das/das_illia.pickle'))
-    dmas_imgs = load_pickle(os.path.join(__O_DIR, 'dmas/dmas_illia.pickle'))
+    orr_imgs = load_pickle(os.path.join(__O_DIR, 'orr/orr_imgs.pickle'))
+    das_imgs = load_pickle(os.path.join(__O_DIR, 'das/das_imgs.pickle'))
+    dmas_imgs = load_pickle(os.path.join(__O_DIR, 'dmas/dmas_imgs.pickle'))
 
     # Get the S11 differences and indices of the breast pairs
     s11_pair_diffs, idx_pairs = get_breast_pair_s11_diffs(s11_data=s11,
                                                           id_pairs=id_pairs,
                                                           md=md)
 
-    # Get sens/spec for each recon method using max intensity
-    # threhsolding
-    das_sens, das_spec, das_preds = do_threshold_classif(imgs=das_imgs[:1000, :, :])
-    dmas_sens, dmas_spec, dmas_preds = do_threshold_classif(imgs=dmas_imgs[:1000, :, :])
-    # orr_sens, orr_spec, orr_preds = do_threshold_classif(imgs=orr_imgs)
+    if do_max_based:  # If using max-based criteria...
+        # Get sens/spec for each recon method using max intensity
+        # threhsolding
+        das_sens, das_spec, das_preds = do_threshold_classif(
+            imgs=das_imgs[:1000, :, :]
+        )
+        dmas_sens, dmas_spec, dmas_preds = do_threshold_classif(
+            imgs=dmas_imgs[:1000, :, :]
+        )
+        orr_sens, orr_spec, orr_preds = do_threshold_classif(imgs=orr_imgs)
 
-    # Do SCR-based analysis...
-    scr_thresholds = np.linspace(0, 30, 100)
-    # orr_sens, orr_spec = get_sens_spec_for_roc(imgs=orr_imgs,
-    #                                            scr_thresholds=scr_thresholds)
-    # das_sens, das_spec = get_sens_spec_for_roc(imgs=das_imgs[:1000, :, :],
-    #                                            scr_thresholds=scr_thresholds)
-    # dmas_sens, dmas_spec = get_sens_spec_for_roc(imgs=dmas_imgs[:1000, :, :],
-    #                                              scr_thresholds=scr_thresholds)
+    else:  # If using SCR+LE -based criteria...
+
+        # Do SCR-based analysis...
+        scr_thresholds = np.linspace(0, 30, 100)
+        orr_sens, orr_spec = get_sens_spec_for_roc(imgs=orr_imgs,
+                                                   scr_thresholds=scr_thresholds)
+        das_sens, das_spec = get_sens_spec_for_roc(imgs=das_imgs[:1000, :, :],
+                                                   scr_thresholds=scr_thresholds)
+        dmas_sens, dmas_spec = get_sens_spec_for_roc(imgs=dmas_imgs[:1000, :, :],
+                                                     scr_thresholds=scr_thresholds)
 
     # Get the AUC for each recon method
     das_auc = get_roc_auc(sens=das_sens, spec=das_spec)
     dmas_auc = get_roc_auc(sens=dmas_sens, spec=dmas_spec)
-    # orr_auc = get_roc_auc(sens=orr_sens, spec=orr_spec)
+    orr_auc = get_roc_auc(sens=orr_sens, spec=orr_spec)
 
     # Make the figure
     plt.figure(figsize=(10, 8))
@@ -548,9 +556,9 @@ if __name__ == "__main__":
     plt.plot(100 - dmas_spec, dmas_sens, c=dmas_col, linestyle='--',
              label="DMAS (AUC: %.1f%%)"
                    % (dmas_auc))
-    # plt.plot(100 - orr_spec, orr_sens, c=gd_col, linestyle='--',
-    #          label="ORR (AUC: %.1f%%)"
-    #                % (orr_auc))
+    plt.plot(100 - orr_spec, orr_sens, c=gd_col, linestyle='--',
+             label="ORR (AUC: %.1f%%)"
+                   % (orr_auc))
     plt.plot(np.linspace(0, 100, 100), np.linspace(0, 100, 100),
              c=[0, 108 / 255, 255 / 255], linestyle='--',
              label='Random Classifier')
@@ -565,6 +573,7 @@ if __name__ == "__main__":
                 dpi=300,
                 transparent=False)
 
+    # Uncomment to save predictions if desired
     # save_pickle(das_preds, os.path.join(__O_DIR, 'das_preds.pickle'))
     # save_pickle(dmas_preds, os.path.join(__O_DIR, 'dmas_preds.pickle'))
     # save_pickle(orr_preds, os.path.join(__O_DIR, 'orr_preds.pickle'))

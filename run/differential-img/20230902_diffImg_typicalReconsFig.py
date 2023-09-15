@@ -156,7 +156,6 @@ if __name__ == "__main__":
         img_to_plt = np.abs(img_to_plt) / np.max(np.abs(img_to_plt))
         img_to_plt[~roi] = np.NaN
 
-        # TODO: Fix these place holders
         if i <= 2:
             idxs_here = d1_idxs
         elif i > 2 and i <= 5:
